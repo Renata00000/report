@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Assessment Report - Shopee Logistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #E5E7EB;
+            color: #1F2937;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #1F3A5F 0%, #2C4A6F 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        /* TABS NAVIGATION */
+        .tabs {
+            background: white;
+            display: flex;
+            border-bottom: 3px solid #1F3A5F;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .tab {
+            flex: 1;
+            padding: 18px 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: 1px solid #E5E7EB;
+            transition: all 0.3s;
+            background: #F9FAFB;
+        }
+        .tab:hover {
+            background: #F3F4F6;
+        }
+        .tab.active {
+            background: #1F3A5F;
+            color: white;
+        }
+        /* CONTENT SECTIONS */
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-height: 600px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* ALERT BOX */
+        .alert-box {
+            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+            border-left: 8px solid #DC2626;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+        }
+        .alert-box h3 {
+            color: #7F1D1D;
+            font-size: 22px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+        .alert-box p {
+            color: #991B1B;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        /* CARDS GRID ESTILO TXT1 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .card {
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-left: 6px solid #3B82F6;
+            padding: 25px;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .card-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .card-value {
+            font-size: 42px;
+            font-weight: 900;
+            color: #1F2937;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .card-description {
+            font-size: 13px;
+            color: #6B7280;
+        }
+        /* SPEEDOMETER */
+        .speedometer-container {
+            text-align: center;
+            padding: 40px;
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+        .speedometer-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .score-display {
+            font-size: 72px;
+            font-weight: 900;
+            margin: 20px 0 10px;
+            line-height: 1;
+        }
+        .score-label {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        /* MINI GAUGES */
+        .mini-gauges {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 25px;
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .mini-gauge {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+        .mini-gauge-value {
+            font-size: 24px;
+            font-weight: 900;
+            margin-top: 10px;
+        }
+        .mini-gauge-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-top: 5px;
+        }
+        .mini-gauge-range {
+            font-size: 11px;
+            color: #6B7280;
+        }
+        /* RISK MATRIX */
+        .risk-matrix {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .matrix-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .matrix-grid {
+            display: inline-block;
+            border: 3px solid #374151;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .matrix-row {
+            display: flex;
+        }
+        .matrix-cell {
+            width: 70px;
+            height: 60px;
+            border: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 28px;
+            color: white;
+            transition: transform 0.2s;
+        }
+        .matrix-cell.marked {
+            border: 4px solid #1F2937;
+            font-size: 32px;
+        }
+        .matrix-cell:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .matrix-label {
+            background: #F9FAFB;
+            color: #1F2937;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 8px;
+        }
+        .matrix-info-box {
+            margin-top: 30px;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            background: #FEF3C7;
+            border-left: 6px solid #F59E0B;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        /* CASCADE */
+        .cascade-container {
+            margin: 30px 0;
+            padding: 25px;
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+        }
+        .cascade-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .cascade-item {
+            margin-bottom: 20px;
+        }
+        .cascade-bar {
+            height: 60px;
+            background: #E5E7EB;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .cascade-bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            transition: width 0.5s ease;
+            color: white;
+            font-weight: 700;
+        }
+        .cascade-matrices {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .cascade-matrix-box {
+            border: 4px solid;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .cascade-matrix-box.hoje {
+            border-color: #3B82F6;
+            background: #EFF6FF;
+        }
+        .cascade-matrix-box.dias7 {
+            border-color: #F59E0B;
+            background: #FEF3C7;
+        }
+        .cascade-matrix-box.dias30 {
+            border-color: #DC2626;
+            background: #FEE2E2;
+        }
+        .cascade-visual-item {
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 8px solid;
+        }
+        .cascade-visual-item.primario {
+            background: #EFF6FF;
+            border-color: #3B82F6;
+        }
+        .cascade-visual-item.secundario {
+            background: #FEF3C7;
+            border-color: #F59E0B;
+        }
+        .cascade-visual-item.terciario {
+            background: #FEE2E2;
+            border-color: #DC2626;
+        }
+        /* TABLES */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .data-table thead {
+            background: #1F3A5F;
+            color: white;
+        }
+        .data-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .data-table td {
+            padding: 15px;
+            border: 1px solid #E5E7EB;
+        }
+        .data-table tbody tr:nth-child(even) {
+            background: #F9FAFB;
+        }
+        .data-table tbody tr:hover {
+            background: #F3F4F6;
+        }
+        /* CHART CONTAINER */
+        .chart-container {
+            margin: 30px 0;
+            padding: 25px;
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        /* RECOMMENDATIONS */
+        .recommendations-box {
+            background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+            border-left: 8px solid #10B981;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .recommendations-box h3 {
+            font-size: 18px;
+            font-weight: 900;
+            color: #065F46;
+            margin-bottom: 15px;
+        }
+        .recommendations-box ul {
+            list-style: none;
+            padding: 0;
+        }
+        .recommendations-box li {
+            font-size: 15px;
+            color: #047857;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        .recommendations-box li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10B981;
+            font-weight: 900;
+            font-size: 18px;
+        }
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .cards-grid,
+            .cascade-matrices {
+                grid-template-columns: 1fr;
+            }
+            .mini-gauges {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>SECURITY ASSESSMENT REPORT</h1>
+            <div class="subtitle">Sistema SPX × LPR | Risk Analysis & Management</div>
+            <div class="header-info">
+                <div>Localidade: <strong>SOC</strong></div>
+                <div>Data da Análise: <strong id="currentDate"></strong></div>
+                <div>Status: <strong style="color: #FCD34D;">UNDER REVIEW</strong></div>
+            </div>
+        </div>
+        <!-- TABS -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('overview')">📊 Overview Executivo</div>
+            <div class="tab" onclick="switchTab('risk-cascade')">⚠️ Risk Cascade</div>
+            <div class="tab" onclick="switchTab('risk-analysis')">🎯 Risk Analysis</div>
+            <div class="tab" onclick="switchTab('lpr')">🔹 LPR Analytics</div>
+            <div class="tab" onclick="switchTab('multiplas-ats')">🔄 Múltiplas ATs</div>
+            <div class="tab" onclick="switchTab('detailed-reports')">📈 Relatórios Detalhados</div>
+            <div class="tab" onclick="switchTab('reports')">📄 Reports</div>
+        </div>
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- TAB 1: OVERVIEW EXECUTIVO -->
+            <div id="overview" class="tab-content active">
+                <h2 style="margin-bottom: 20px; font-size: 28px;">VISÃO EXECUTIVA - ALTA GESTÃO</h2>
+                <!-- ALERT CRÍTICO -->
+                <div class="alert-box">
+                    <h3>🚨 SITUAÇÃO CRÍTICA IDENTIFICADA</h3>
+                    <p>
+                        Foram detectadas <strong style="font-size: 24px;">114 divergências críticas</strong> no cruzamento SPX × LPR,
+                        com impacto financeiro de <strong style="font-size: 24px;">R$ 158.823</strong>. 
+                        Taxa de fraude: <strong style="font-size: 24px;">0.8%</strong>
+                    </p>
+                </div>
+                <!-- KPIs PRINCIPAIS ESTILO TXT1 -->
+                <div class="cards-grid">
+                    <div class="card" style="border-left-color: #3B82F6;">
+                        <div class="card-label">Total Carregamentos</div>
+                        <div class="card-value">14,206</div>
+                        <div class="card-description">Volume operacional</div>
+                    </div>
+                    <div class="card" style="border-left-color: #DC2626;">
+                        <div class="card-label">Divergências Críticas</div>
+                        <div class="card-value">114</div>
+                        <div class="card-description">Casos identificados</div>
+                    </div>
+                    <div class="card" style="border-left-color: #F59E0B;">
+                        <div class="card-label">Impacto Financeiro</div>
+                        <div class="card-value">R$ 158K</div>
+                        <div class="card-description">Estimativa de perdas</div>
+                    </div>
+                    <div class="card" style="border-left-color: #FCD34D;">
+                        <div class="card-label">Taxa de Fraude</div>
+                        <div class="card-value">0.8%</div>
+                        <div class="card-description">Índice de divergências</div>
+                    </div>
+                </div>
+                <!-- VULNERABILIDADE SCORE -->
+                <div class="speedometer-container">
+                    <div class="speedometer-title">🎯 VULNERABILITY GRADING SCORE</div>
+                    <canvas id="speedometerCanvas" width="400" height="200"></canvas>
+                    <div class="score-display" id="scoreDisplay">26</div>
+                    <div class="score-label" id="scoreLabel">INACEITÁVEL</div>
+                    <p style="margin-top: 15px; color: #6B7280; font-size: 14px;">
+                        Score baseado na média de 8 áreas críticas de segurança
+                    </p>
+                </div>
+                <!-- ASSESSMENT RATING -->
+                <h3 style="margin: 40px 0 20px; text-align: center; font-size: 20px;">📊 ASSESSMENT RATING SCORE</h3>
+                <div class="mini-gauges" id="miniGaugesContainer">
+                    <!-- Preenchido via JS -->
+                </div>
+                <!-- MATRIZ RISCO ATUAL -->
+                <div class="risk-matrix">
+                    <div class="matrix-title">⚠️ MATRIZ DE RISCO - SITUAÇÃO ATUAL</div>
+                    <div class="matrix-grid" id="riskMatrixOverview">
+                        <!-- Preenchido via JS -->
+                    </div>
+                    <div class="matrix-info-box">
+                        <div style="font-size: 18px; font-weight: 900; color: #DC2626; margin-bottom: 10px;">
+                            Classificação: RISCO ELEVADO
+                        </div>
+                        <div style="font-size: 14px; color: #374151; line-height: 1.8;">
+                            <div><strong>Probabilidade:</strong> Média (114 ocorrências detectadas)</div>
+                            <div><strong>Impacto Financeiro:</strong> Grave (R$ 158.823 em perdas)</div>
+                            <div><strong>Tendência:</strong> Escalada para EXTREMO em 7 dias sem ação</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- EFEITO CASCATA -->
+                <div class="cascade-container">
+                    <div class="cascade-title">📈 EFEITO CASCATA DE RISCO</div>
+                    <div id="cascadeOverview">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+                <!-- SEÇÃO: PANORAMA OPERACIONAL -->
+                <h2 style="margin: 50px 0 20px; font-size: 28px; text-align: center; color: #1F3A5F;">🎯 PANORAMA OPERACIONAL CONSOLIDADO</h2>
+                <div style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-left: 8px solid #F59E0B; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                    <p style="font-size: 14px; color: #78350F; line-height: 1.6;">
+                        <strong>📊 ANÁLISE INTEGRADA:</strong> Esta seção consolida os dois principais vetores de risco operacional: 
+                        <strong>Fraudes por Categorias Divergentes</strong> (114 casos) e <strong>Padrões de Múltiplas ATs</strong> (746 motoristas reincidentes).
+                    </p>
+                </div>
+                <!-- CARDS COMPARATIVOS -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+                    <!-- CARD 2: MÚLTIPLAS ATs -->
+                    <div style="background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%); border: 3px solid #3B82F6; border-radius: 12px; padding: 30px;">
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                            <div style="background: #3B82F6; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white;">
+                                🔄
+                            </div>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 700; color: #1E3A8A; text-transform: uppercase;">MONITORAMENTO CONTÍNUO</div>
+                                <div style="font-size: 20px; font-weight: 900; color: #1E40AF;">Múltiplas ATs</div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+                            <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 32px; font-weight: 900; color: #3B82F6;">746</div>
+                                <div style="font-size: 12px; color: #1E3A8A; font-weight: 600;">Reincidentes</div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 32px; font-weight: 900; color: #3B82F6;">2,487</div>
+                                <div style="font-size: 12px; color: #1E3A8A; font-weight: 600;">ATs Duplicadas</div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 24px; font-weight: 900; color: #3B82F6;">52</div>
+                                <div style="font-size: 12px; color: #1E3A8A; font-weight: 600;">Casos Críticos</div>
+                            </div>
+                            <div style="background: rgba(255, 255, 255, 0.8); padding: 15px; border-radius: 8px;">
+                                <div style="font-size: 24px; font-weight: 900; color: #3B82F6;">3.3</div>
+                                <div style="font-size: 12px; color: #1E3A8A; font-weight: 600;">Média ATs/Mot.</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(30, 58, 138, 0.8); color: white; padding: 12px; border-radius: 6px; text-align: center; font-weight: 700; font-size: 13px;">
+                            📋 AUDITORIA PROGRAMADA
+                        </div>
+                    </div>
+                </div>
+                <!-- GRÁFICOS LADO A LADO -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+                    <!-- Gráfico Categorias -->
+                    <div class="chart-container" style="margin: 0;">
+                        <div class="chart-title" style="color: #DC2626;">🚗 TOP 5 CATEGORIAS FRAUDADAS</div>
+                        <canvas id="chartCategoriasOverview"></canvas>
+                    </div>
+                    <!-- Gráfico Múltiplas ATs -->
+                    <div class="chart-container" style="margin: 0;">
+                        <div class="chart-title" style="color: #3B82F6;">🔄 CLUSTERS DE RISCO - MÚLTIPLAS ATs</div>
+                        <canvas id="chartClustersOverview"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- TAB 2: RISK CASCADE -->
+            <div id="risk-cascade" class="tab-content">
+                <h2 style="margin-bottom: 20px; font-size: 28px;">⚠️ ANÁLISE DE RISCO EM CASCATA</h2>
+                <div style="background: #FEF3C7; border-left: 8px solid #F59E0B; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                    <p style="font-size: 14px; color: #78350F; line-height: 1.6;">
+                        <strong>📖 Conceito:</strong> Esta análise demonstra como riscos <strong>não tratados</strong> evoluem ao longo do tempo,
+                        escalando de níveis moderados para críticos/extremos, gerando <strong>efeito cascata</strong> que pode colapsar o sistema.
+                    </p>
+                </div>
+                <!-- 3 MATRIZES TEMPORAIS -->
+                <div class="cascade-matrices">
+                    <div class="cascade-matrix-box hoje">
+                        <div style="font-size: 18px; font-weight: 900; color: #1E40AF; margin-bottom: 15px;">🟦 HOJE</div>
+                        <div id="matrizHoje" style="display: inline-block;">
+                            <!-- Preenchido via JS -->
+                        </div>
+                        <div style="font-size: 13px; margin-top: 15px; text-align: left;">
+                            <div><strong>Status:</strong> <span style="color: #F59E0B;">ELEVADO</span></div>
+                            <div><strong>Casos:</strong> 114</div>
+                            <div><strong>Impacto:</strong> R$ 158K</div>
+                        </div>
+                    </div>
+                    <div class="cascade-matrix-box dias7">
+                        <div style="font-size: 18px; font-weight: 900; color: #D97706; margin-bottom: 15px;">🟨 +7 DIAS</div>
+                        <div id="matriz7dias" style="display: inline-block;">
+                            <!-- Preenchido via JS -->
+                        </div>
+                        <div style="font-size: 13px; margin-top: 15px; text-align: left;">
+                            <div><strong>Status:</strong> <span style="color: #DC2626;">EXTREMO</span></div>
+                            <div><strong>Projeção:</strong> ~400 casos</div>
+                            <div><strong>Impacto:</strong> R$ 550K</div>
+                        </div>
+                    </div>
+                    <div class="cascade-matrix-box dias30">
+                        <div style="font-size: 18px; font-weight: 900; color: #B91C1C; margin-bottom: 15px;">🟥 +30 DIAS</div>
+                        <div id="matriz30dias" style="display: inline-block;">
+                            <!-- Preenchido via JS -->
+                        </div>
+                        <div style="font-size: 13px; margin-top: 15px; text-align: left;">
+                            <div><strong>Status:</strong> <span style="color: #7F1D1D;">CATASTRÓFICO</span></div>
+                            <div><strong>Projeção:</strong> ~1,500 casos</div>
+                            <div><strong>Impacto:</strong> R$ 2.1M</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- CASCATA VISUAL -->
+                <h3 style="margin: 40px 0 20px; font-size: 20px;">📊 EFEITO CASCATA - ÁREAS IMPACTADAS</h3>
+                <div>
+                    <div class="cascade-visual-item primario">
+                        <div style="font-size: 16px; font-weight: 900; color: #1E40AF; margin-bottom: 10px;">🟦 NÍVEL PRIMÁRIO</div>
+                        <div style="font-size: 14px; line-height: 1.6; color: #374151;">
+                            <strong>Divergências LPR × SPX:</strong> 114 casos identificados<br>
+                            <strong>Causa Raiz:</strong> Falhas na leitura (461) + Placas incorretas (111) + Fraudes de categoria<br>
+                            <strong>Taxa de Sucesso LPR:</strong> 77.8% (abaixo da meta de 90%)
+                        </div>
+                    </div>
+                    <div class="cascade-visual-item secundario">
+                        <div style="font-size: 16px; font-weight: 900; color: #D97706; margin-bottom: 10px;">🟨 NÍVEL SECUNDÁRIO (+7 dias)</div>
+                        <div style="font-size: 14px; line-height: 1.6; color: #374151;">
+                            <strong>Motoristas Reincidentes:</strong> 746 → Projeção 2,000+<br>
+                            <strong>Placas VIA Indevidas:</strong> 671 → Projeção 2,300+<br>
+                            <strong>Impacto:</strong> Perda progressiva de controle operacional<br>
+                            <strong>Horário Crítico:</strong> 19h (maior concentração de fraudes)
+                        </div>
+                    </div>
+                    <div class="cascade-visual-item terciario">
+                        <div style="font-size: 16px; font-weight: 900; color: #B91C1C; margin-bottom: 10px;">🟥 NÍVEL TERCIÁRIO (+30 dias)</div>
+                        <div style="font-size: 14px; line-height: 1.6; color: #374151;">
+                            <strong>Colapso do Sistema:</strong> LPR com 0% de confiança operacional<br>
+                            <strong>Impacto Financeiro:</strong> R$ 2.1M em perdas acumuladas<br>
+                            <strong>Consequências:</strong> Necessidade de auditoria total + Paralisação operacional<br>
+                            <strong>Risco Reputacional:</strong> Exposição a fraudes sistemáticas
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- TAB 3: RISK ANALYSIS -->
+            <div id="risk-analysis" class="tab-content">
+                <h2 style="margin-bottom: 20px; font-size: 28px;">🎯 ANÁLISE COMPLETA DE RISCO</h2>
+                <div class="risk-matrix">
+                    <div class="matrix-title">MATRIZ DE CLASSIFICAÇÃO DE RISCO 5×5</div>
+                    <div class="matrix-grid" id="riskMatrixDetail">
+                        <!-- Preenchido via JS -->
+                    </div>
+                    <div style="margin-top: 30px;">
+                        <table class="data-table" style="max-width: 600px; margin: 0 auto;">
+                            <tr style="background: #F9FAFB;">
+                                <td style="font-weight: 700; width: 40%;">Classificação:</td>
+                                <td style="color: #DC2626; font-weight: 700;">RISCO ELEVADO</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 700;">Probabilidade:</td>
+                                <td>MÉDIA (114 ocorrências)</td>
+                            </tr>
+                            <tr style="background: #F9FAFB;">
+                                <td style="font-weight: 700;">Impacto Financeiro:</td>
+                                <td>GRAVE (R$ 158.823)</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 700;">Ação Requerida:</td>
+                                <td style="color: #DC2626; font-weight: 700;">IMEDIATA</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <!-- MÉTRICAS SECUNDÁRIAS -->
+                <h3 style="margin: 40px 0 20px; font-size: 20px;">📊 MÉTRICAS DE RISCO SECUNDÁRIAS</h3>
+                <div class="cards-grid">
+                    <div class="card" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">✓</div>
+                        <div class="card-value" style="color: white;">11,053</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Reconhecidos (77.8%)</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">✗</div>
+                        <div class="card-value" style="color: white;">461</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Não Reconhecidos (3.2%)</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">🚫</div>
+                        <div class="card-value" style="color: white;">111</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Placas Incorretas (0.8%)</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">🔄</div>
+                        <div class="card-value" style="color: white;">746</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Motoristas Reincidentes</div>
+                    </div>
+                </div>
+                <!-- GRÁFICO HORÁRIO -->
+                <div class="chart-container">
+                    <div class="chart-title">⏰ Distribuição por Horário - Pico de Fraudes</div>
+                    <canvas id="chartHorario"></canvas>
+                </div>
+                <!-- GRÁFICO CATEGORIAS -->
+                <div class="chart-container">
+                    <div class="chart-title">🚗 Divergências por Categoria de Veículo</div>
+                    <canvas id="chartCategorias"></canvas>
+                </div>
+            </div>
+            <!-- TAB 4: LPR ANALYTICS -->
+            <div id="lpr" class="tab-content">
+                <h2 style="margin-bottom: 20px; font-size: 28px;">🔹 ANÁLISE DE DESEMPENHO DA CÂMERA LPR</h2>
+                <div class="cards-grid">
+                    <div class="card" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">✓</div>
+                        <div class="card-value" style="color: white;">77.8%</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Taxa de Sucesso LPR</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">✗</div>
+                        <div class="card-value" style="color: white;">461</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Não Reconhecidos</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">🚫</div>
+                        <div class="card-value" style="color: white;">111</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Placas Incorretas</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">⚠️</div>
+                        <div class="card-value" style="color: white;">22.2%</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Taxa de Falha Total</div>
+                    </div>
+                </div>
+                <div class="recommendations-box">
+                    <h3>🔧 RECOMENDAÇÕES TÉCNICAS PRIORITÁRIAS</h3>
+                    <ul>
+                        <li><strong>Calibração Imediata:</strong> Taxa de 77.8% está 12.2% abaixo da meta de 90%</li>
+                        <li><strong>Ajuste de Iluminação:</strong> 111 leituras incorretas indicam problemas de luz/ângulo</li>
+                        <li><strong>Limpeza de Lentes:</strong> Implementar manutenção preventiva semanal</li>
+                        <li><strong>Upgrade de Firmware:</strong> Melhorar algoritmo OCR para reduzir erros</li>
+                        <li><strong>Sistema de Redundância:</strong> Avaliar instalação de segunda câmera para backup</li>
+                        <li><strong>Teste de Performance:</strong> Realizar testes em diferentes condições climáticas</li>
+                    </ul>
+                </div>
+                <!-- GRÁFICO PERFORMANCE LPR -->
+                <div class="chart-container">
+                    <div class="chart-title">📊 Performance LPR - Evolução Semanal</div>
+                    <canvas id="chartLPR"></canvas>
+                </div>
+                <!-- GRÁFICO FALHAS -->
+                <div class="chart-container">
+                    <div class="chart-title">❌ Tipos de Falhas do Sistema LPR</div>
+                    <canvas id="chartFalhas"></canvas>
+                </div>
+            </div>
+            <!-- TAB 5: MÚLTIPLAS ATs -->
+            <div id="multiplas-ats" class="tab-content">
+                <h2 style="margin-bottom: 20px; font-size: 28px;">🔄 ANÁLISE DE MÚLTIPLAS ATs - PADRÕES FRAUDULENTOS</h2>
+                <div style="background: #FEE2E2; border-left: 8px solid #DC2626; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                    <p style="font-size: 14px; color: #7F1D1D; line-height: 1.6;">
+                        <strong>⚠️ ALERTA CRÍTICO:</strong> Foram identificados <strong style="font-size: 18px;">746 motoristas reincidentes</strong> com múltiplas ATs no mesmo dia ou em dias consecutivos. Este padrão indica possível fraude sistemática no processo de carregamento.
+                    </p>
+                </div>
+                <!-- KPIs MÚLTIPLAS ATs -->
+                <div class="cards-grid">
+                    <div class="card" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">👥</div>
+                        <div class="card-value" style="color: white;">746</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Motoristas Reincidentes</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">📊</div>
+                        <div class="card-value" style="color: white;">2,487</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Total de ATs Duplicadas</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">📅</div>
+                        <div class="card-value" style="color: white;">3.3</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Média ATs/Motorista</div>
+                    </div>
+                    <div class="card" style="background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%); color: white; border: none;">
+                        <div style="font-size: 32px; margin-bottom: 12px; opacity: 0.9;">⏰</div>
+                        <div class="card-value" style="color: white;">19h</div>
+                        <div style="font-size: 13px; font-weight: 600; opacity: 0.9;">Horário de Pico</div>
+                    </div>
+                </div>
+                <!-- CLUSTERS DE RISCO -->
+                <h3 style="margin: 40px 0 20px; font-size: 20px;">📊 CLASSIFICAÇÃO POR NÍVEL DE RISCO</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+                    <div style="background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); padding: 25px; border-radius: 12px; text-align: center; border: 3px solid #10B981;">
+                        <div style="font-size: 14px; font-weight: 700; color: #065F46; margin-bottom: 10px;">OCASIONAIS</div>
+                        <div style="font-size: 36px; font-weight: 900; color: #059669; margin-bottom: 5px;">312</div>
+                        <div style="font-size: 12px; color: #047857;">1-5 dias</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); padding: 25px; border-radius: 12px; text-align: center; border: 3px solid #F59E0B;">
+                        <div style="font-size: 14px; font-weight: 700; color: #78350F; margin-bottom: 10px;">FREQUENTES</div>
+                        <div style="font-size: 36px; font-weight: 900; color: #D97706; margin-bottom: 5px;">248</div>
+                        <div style="font-size: 12px; color: #92400E;">6-15 dias</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #FED7AA 0%, #FDBA74 100%); padding: 25px; border-radius: 12px; text-align: center; border: 3px solid #FB923C;">
+                        <div style="font-size: 14px; font-weight: 700; color: #7C2D12; margin-bottom: 10px;">SISTEMÁTICOS</div>
+                        <div style="font-size: 36px; font-weight: 900; color: #EA580C; margin-bottom: 5px;">134</div>
+                        <div style="font-size: 12px; color: #9A3412;">16-30 dias</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); padding: 25px; border-radius: 12px; text-align: center; border: 3px solid #DC2626;">
+                        <div style="font-size: 14px; font-weight: 700; color: #7F1D1D; margin-bottom: 10px;">CRÍTICOS</div>
+                        <div style="font-size: 36px; font-weight: 900; color: #B91C1C; margin-bottom: 5px;">52</div>
+                        <div style="font-size: 12px; color: #991B1B;">30+ dias</div>
+                    </div>
+                </div>
+                <!-- RANKING TOP 20 -->
+                <h3 style="margin: 40px 0 20px; font-size: 20px;">🏆 TOP 20 MOTORISTAS CRÍTICOS</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>Motorista</th>
+                            <th style="width: 100px;">Total Dias</th>
+                            <th style="width: 100px;">Total ATs</th>
+                            <th style="width: 120px;">Média/Dia</th>
+                            <th style="width: 150px;">Nível de Risco</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingMultiplasATs">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+                <!-- GRÁFICOS DE ANÁLISE TEMPORAL -->
+                <h3 style="margin: 40px 0 20px; font-size: 20px;">⏰ ANÁLISE TEMPORAL - PADRÕES DE COMPORTAMENTO</h3>
+                <div class="chart-container">
+                    <div class="chart-title">📈 Distribuição de ATs por Horário</div>
+                    <canvas id="chartHorarioMultiplas"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">📅 Heatmap: Dia da Semana vs Horário</div>
+                    <canvas id="chartHeatmapMultiplas"></canvas>
+                </div>
+                <!-- BOX PLOT -->
+                <div class="chart-container">
+                    <div class="chart-title">📦 Distribuição Estatística - ATs por Motorista</div>
+                    <canvas id="chartBoxPlotMultiplas"></canvas>
+                </div>
+                <!-- RECOMENDAÇÕES -->
+                <div class="recommendations-box" style="margin-top: 30px;">
+                    <h3>🎯 RECOMENDAÇÕES PRIORITÁRIAS</h3>
+                    <ul>
+                        <li><strong>Investigação Imediata:</strong> Priorizar os 52 motoristas no nível CRÍTICO (30+ dias com múltiplas ATs)</li>
+                        <li><strong>Bloqueio Preventivo:</strong> Implementar bloqueio automático para motoristas com 3+ ocorrências consecutivas</li>
+                        <li><strong>Auditoria de Horários:</strong> Reforçar fiscalização no horário de pico (19h) com equipe adicional</li>
+                        <li><strong>Análise de Padrões:</strong> Investigar sequências de dias consecutivos como indicador de fraude organizada</li>
+                        <li><strong>Sistema de Alertas:</strong> Criar alertas em tempo real para motoristas que entrem no cluster FREQUENTE</li>
+                        <li><strong>Revisão de Processos:</strong> Avaliar possíveis falhas no sistema que permitem múltiplas ATs no mesmo período</li>
+                    </ul>
+                </div>
+                <!-- INSIGHTS ESTATÍSTICOS -->
+                <h3 style="margin: 40px 0 20px; font-size: 20px;">💡 INSIGHTS ESTATÍSTICOS</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div style="background: #EFF6FF; border-left: 6px solid #3B82F6; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 16px; font-weight: 700; color: #1E40AF; margin-bottom: 10px;">📊 Concentração de Risco</div>
+                        <div style="font-size: 14px; color: #1E3A8A; line-height: 1.6;">
+                            Os <strong>Top 10 motoristas</strong> representam <strong>28.5%</strong> do total de ATs duplicadas, indicando concentração de risco em poucos indivíduos.
+                        </div>
+                    </div>
+                    <div style="background: #FEF3C7; border-left: 6px solid #F59E0B; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 16px; font-weight: 700; color: #D97706; margin-bottom: 10px;">⏰ Padrão Temporal</div>
+                        <div style="font-size: 14px; color: #78350F; line-height: 1.6;">
+                            <strong>67%</strong> das ocorrências acontecem entre <strong>18h-21h</strong>, sugerindo aproveitamento de menor supervisão no período noturno.
+                        </div>
+                    </div>
+                    <div style="background: #FEE2E2; border-left: 6px solid #DC2626; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 16px; font-weight: 700; color: #B91C1C; margin-bottom: 10px;">🔄 Taxa de Reincidência</div>
+                        <div style="font-size: 14px; color: #7F1D1D; line-height: 1.6;">
+                            <strong>31.2%</strong> dos motoristas são reincidentes com 3+ ocorrências, demonstrando padrão sistemático de comportamento fraudulento.
+                        </div>
+                    </div>
+                    <div style="background: #D1FAE5; border-left: 6px solid #10B981; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 16px; font-weight: 700; color: #065F46; margin-bottom: 10px;">📅 Sequências Críticas</div>
+                        <div style="font-size: 14px; color: #047857; line-height: 1.6;">
+                            Identificadas <strong>89 sequências</strong> de 5+ dias consecutivos, indicando possível organização em esquema de fraude coordenada.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="detailed-reports" class="tab-content">
+                <h2 style="margin-bottom: 20px; font-size: 28px;">📈 RELATÓRIOS DETALHADOS - ANÁLISE COMPLETA</h2>
+                <p style="background: #EFF6FF; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 6px solid #3B82F6;">
+                    <strong>📖 Sobre esta seção:</strong> Esta aba consolida todos os dados dos relatórios PDF em visualizações interativas e análises aprofundadas.
+                    Aqui você encontra detalhamento completo de todas as métricas, tendências e insights operacionais.
+                </p>
+                <!-- ANÁLISE POR CATEGORIA -->
+                <h3 style="margin: 30px 0 20px; font-size: 20px;">🚗 Análise Detalhada por Categoria de Veículo</h3>
+                <!-- Card de Gauge Principal -->
+                <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border: 3px solid #3B82F6; border-radius: 12px; padding: 30px; margin-bottom: 30px; text-align: center;">
+                    <h4 style="color: #1E40AF; font-size: 18px; font-weight: 900; margin-bottom: 20px;">NÍVEL DE RISCO OPERACIONAL</h4>
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 40px;">
+                        <div>
+                            <canvas id="gaugeRiscoOperacional" width="200" height="120"></canvas>
+                        </div>
+                        <div style="text-align: left;">
+                            <div style="font-size: 48px; font-weight: 900; color: #DC2626; margin-bottom: 10px;">0.8%</div>
+                            <div style="font-size: 16px; color: #374151; font-weight: 600;">TAXA DE FRAUDE</div>
+                            <div style="font-size: 14px; color: #6B7280; margin-top: 10px;">114 casos em 14,206 carregamentos</div>
+                        </div>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Total</th>
+                            <th>Divergências</th>
+                            <th>Taxa de Fraude</th>
+                            <th>Impacto (R$)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Passeio</strong></td>
+                            <td>6,893</td>
+                            <td>51</td>
+                            <td style="color: #DC2626; font-weight: 700;">0.74%</td>
+                            <td>R$ 71,043</td>
+                            <td><span style="background: #FEE2E2; color: #DC2626; padding: 4px 12px; border-radius: 4px; font-weight: 700;">Alto Risco</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>VAN</strong></td>
+                            <td>4,127</td>
+                            <td>35</td>
+                            <td style="color: #F59E0B; font-weight: 700;">0.85%</td>
+                            <td>R$ 48,725</td>
+                            <td><span style="background: #FEF3C7; color: #D97706; padding: 4px 12px; border-radius: 4px; font-weight: 700;">Médio Risco</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Utilitário</strong></td>
+                            <td>2,156</td>
+                            <td>18</td>
+                            <td style="color: #F59E0B; font-weight: 700;">0.83%</td>
+                            <td>R$ 25,056</td>
+                            <td><span style="background: #FEF3C7; color: #D97706; padding: 4px 12px; border-radius: 4px; font-weight: 700;">Médio Risco</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fiorino</strong></td>
+                            <td>1,030</td>
+                            <td>10</td>
+                            <td style="color: #FBBF24; font-weight: 700;">0.97%</td>
+                            <td>R$ 13,999</td>
+                            <td><span style="background: #FEF9C3; color: #CA8A04; padding: 4px 12px; border-radius: 4px; font-weight: 700;">Atenção</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- GRÁFICO COMPARATIVO -->
+                <div class="chart-container">
+                    <div class="chart-title">📊 Comparativo: Taxa de Fraude vs Impacto Financeiro</div>
+                    <canvas id="chartComparativo"></canvas>
+                </div>
+                <!-- TOP REINCIDENTES -->
+                <h3 style="margin: 40px 0 20px; font-size: 20px;">🔄 Top 10 Motoristas com Maior Impacto Financeiro</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Motorista</th>
+                            <th>Ocorrências</th>
+                            <th>SPX Declarado</th>
+                            <th>LPR Real</th>
+                            <th>Valor SPX (R$)</th>
+                            <th>Valor LPR (R$)</th>
+                            <th>Prejuízo (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topReincidentesTable">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+                <!-- IMPACTO FINANCEIRO POR MOTORISTA - BARRAS EMPILHADAS COM 3 CAMADAS -->
+                <div class="chart-container">
+                    <div class="chart-title">💰 Análise de Impacto Financeiro - Valor Correto (LPR) vs Valor Pago (SPX)</div>
+                    <canvas id="chartImpactoA"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">🔄 Padrões de Divergência - SPX vs LPR</div>
+                    <canvas id="chartPadroesDivergencia"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">📅 Evolução Temporal - Últimos 6 Meses</div>
+                    <canvas id="chartTemporal"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">🔥 Mapa de Calor - Horários Críticos</div>
+                    <canvas id="chartHeatmap"></canvas>
+                </div>
+            </div>
+            <!-- TAB 7: REPORTS -->
+            <div id="reports" class="tab-content">
+                <h2 style="margin-bottom: 20px;">DOCUMENTAÇÃO DISPONÍVEL</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="border: 2px solid #E5E7EB; padding: 25px; border-radius: 8px;">
+                        <h3 style="color: #1F3A5F; margin-bottom: 10px;">📄 PDF Executivo</h3>
+                        <p style="color: #6B7280; margin-bottom: 15px;">Dashboards visuais com gráficos e análises</p>
+                        <button style="background: #1F3A5F; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: 700;">DOWNLOAD</button>
+                    </div>
+                    <div style="border: 2px solid #E5E7EB; padding: 25px; border-radius: 8px;">
+                        <h3 style="color: #1F3A5F; margin-bottom: 10px;">📊 Relatórios TXT</h3>
+                        <p style="color: #6B7280; margin-bottom: 15px;">Listagens completas com todos os detalhes</p>
+                        <button style="background: #1F3A5F; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: 700;">DOWNLOAD</button>
+                    </div>
+                    <div style="border: 2px solid #E5E7EB; padding: 25px; border-radius: 8px;">
+                        <h3 style="color: #1F3A5F; margin-bottom: 10px;">🚨 Alerta de Fraude</h3>
+                        <p style="color: #6B7280; margin-bottom: 15px;">Casos prioritários para análise imediata</p>
+                        <button style="background: #DC2626; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: 700;">DOWNLOAD</button>
+                    </div>
+                    <!-- Campo para ID da Planilha -->
+                    <div style="border: 2px solid #E5E7EB; padding: 25px; border-radius: 8px;">
+                        <h3 style="color: #1F3A5F; margin-bottom: 10px;">📊 Google Sheets</h3>
+                        <p style="color: #6B7280; margin-bottom: 15px;">ID da Planilha:</p>
+                        <input type="text" id="sheetIdInput" placeholder="Insira o ID da planilha" style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box;">
+                        <button onclick="openGoogleSheet()" style="background: #22C55E; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: 700;">ABRIR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // DADOS DO PROJETO
+        const dados = {
+            totalCarregamentos: 14206,
+            veiculosIndevidos: 114,
+            impactoFinanceiro: 158823,
+            taxaFraude: 0.8,
+            reconhecidos: 11053,
+            naoReconhecidos: 461,
+            placasIncorretas: 111,
+            motoristasReincidentes: 746,
+            motoristasBloqueados: 13,
+            placasViaIndevidas: 671,
+            horarioPico: 19,
+            taxaSucessoLPR: 77.8,
+            areas: [
+                { nome: 'CPTED', percent: 85, categoria: 'Forte' },
+                { nome: 'Controle de Acesso / Barreira Física', percent: 27, categoria: 'Crítico' },
+                { nome: 'Iluminação de Segurança', percent: 50, categoria: 'Marginal' },
+                { nome: 'Sistema de Detecção', percent: 0, categoria: 'Inaceitável' },
+                { nome: 'Sistema de CFTV', percent: 0, categoria: 'Inaceitável' },
+                { nome: 'Procedimentos e Cultura de Segurança', percent: 9, categoria: 'Inaceitável' },
+                { nome: 'Segurança Terceirizada', percent: 52, categoria: 'Marginal' },
+                { nome: 'Integração dos Sistemas', percent: 0, categoria: 'Inaceitável' }
+            ]
+        };
+        // DATA ATUAL
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('pt-BR');
+        // SWITCH TABS
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+        // CALCULAR SCORE DE VULNERABILIDADE
+        const scoreVulnerabilidade = Math.round(dados.areas.reduce((acc, area) => acc + area.percent, 0) / dados.areas.length);
+        // FUNÇÃO PARA DESENHAR VELOCÍMETRO (MELHORADO - MAIS GROSSO)
+        function drawSpeedometer(canvasId, value, isLarge = false) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = isLarge ? canvas.height - 20 : canvas.height - 10;
+            const radius = isLarge ? 150 : 80;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Arco colorido (MAIS GROSSO) - invertido para valor baixo = vermelho
+            const startAngle = Math.PI;
+            const endAngle = 2 * Math.PI;
+            // Desenhar segmentos coloridos INVERTIDOS (0-44 vermelho, 86-100 verde)
+            const segments = [
+                { start: 0, end: 0.2, color: '#DC2626' },      // Vermelho (0-20)
+                { start: 0.2, end: 0.4, color: '#F59E0B' },    // Laranja (20-40)
+                { start: 0.4, end: 0.6, color: '#FBBF24' },    // Amarelo (40-60)
+                { start: 0.6, end: 0.8, color: '#84CC16' },    // Verde-amarelo (60-80)
+                { start: 0.8, end: 1.0, color: '#10B981' }     // Verde (80-100)
+            ];
+            segments.forEach(seg => {
+                const segStartAngle = startAngle + seg.start * Math.PI;
+                const segEndAngle = startAngle + seg.end * Math.PI;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, segStartAngle, segEndAngle);
+                ctx.lineWidth = isLarge ? 35 : 20;
+                ctx.strokeStyle = seg.color;
+                ctx.lineCap = 'butt';
+                ctx.stroke();
+            });
+            // Adicionar bordas internas e externas para efeito 3D
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius + (isLarge ? 17 : 10), startAngle, endAngle);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius - (isLarge ? 17 : 10), startAngle, endAngle);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.stroke();
+            // Marcadores de escala
+            const numMarkers = isLarge ? 11 : 6;
+            for (let i = 0; i <= numMarkers; i++) {
+                const angle = startAngle + (i / numMarkers) * Math.PI;
+                const innerRadius = radius - (isLarge ? 25 : 15);
+                const outerRadius = radius - (isLarge ? 15 : 10);
+                ctx.beginPath();
+                ctx.moveTo(
+                    centerX + innerRadius * Math.cos(angle),
+                    centerY + innerRadius * Math.sin(angle)
+                );
+                ctx.lineTo(
+                    centerX + outerRadius * Math.cos(angle),
+                    centerY + outerRadius * Math.sin(angle)
+                );
+                ctx.lineWidth = isLarge ? 3 : 2;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.stroke();
+            }
+            // Ponteiro ESTILIZADO (gordinho na base, fino na ponta)
+            const angle = startAngle + (value / 100) * Math.PI;
+            const pointerLength = radius - (isLarge ? 25 : 15);
+            // Calcular pontos do ponteiro em forma de flecha
+            const tipX = centerX + pointerLength * Math.cos(angle);
+            const tipY = centerY + pointerLength * Math.sin(angle);
+            const baseWidth = isLarge ? 12 : 6; // Largura na base
+            const perpAngle = angle + Math.PI / 2;
+            const baseLeft = {
+                x: centerX + baseWidth * Math.cos(perpAngle),
+                y: centerY + baseWidth * Math.sin(perpAngle)
+            };
+            const baseRight = {
+                x: centerX - baseWidth * Math.cos(perpAngle),
+                y: centerY - baseWidth * Math.sin(perpAngle)
+            };
+            // Sombra do ponteiro
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctx.shadowBlur = isLarge ? 8 : 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            // Desenhar ponteiro como triângulo
+            ctx.beginPath();
+            ctx.moveTo(tipX, tipY);
+            ctx.lineTo(baseLeft.x, baseLeft.y);
+            ctx.lineTo(baseRight.x, baseRight.y);
+            ctx.closePath();
+            // Gradiente no ponteiro para dar profundidade
+            const pointerGradient = ctx.createLinearGradient(centerX, centerY - baseWidth, centerX, centerY + baseWidth);
+            pointerGradient.addColorStop(0, '#4B5563');
+            pointerGradient.addColorStop(0.5, '#1F2937');
+            pointerGradient.addColorStop(1, '#111827');
+            ctx.fillStyle = pointerGradient;
+            ctx.fill();
+            // Contorno do ponteiro
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = isLarge ? 1.5 : 1;
+            ctx.stroke();
+            // Remover sombra
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            // Base do ponteiro (círculo central maior) com efeito 3D
+            // Círculo externo (sombra)
+            ctx.beginPath();
+            ctx.arc(centerX + 1, centerY + 1, isLarge ? 16 : 9, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fill();
+            // Círculo principal escuro
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, isLarge ? 15 : 8, 0, 2 * Math.PI);
+            const circleGradient = ctx.createRadialGradient(centerX - 3, centerY - 3, 0, centerX, centerY, isLarge ? 15 : 8);
+            circleGradient.addColorStop(0, '#4B5563');
+            circleGradient.addColorStop(1, '#1F2937');
+            ctx.fillStyle = circleGradient;
+            ctx.fill();
+            // Contorno
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = isLarge ? 2 : 1;
+            ctx.stroke();
+            // Círculo interno branco (brilho)
+            ctx.beginPath();
+            ctx.arc(centerX - (isLarge ? 3 : 2), centerY - (isLarge ? 3 : 2), isLarge ? 5 : 3, 0, 2 * Math.PI);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fill();
+            // Labels de valores (0, 50, 100)
+            if (isLarge) {
+                ctx.font = 'bold 14px Arial';
+                ctx.fillStyle = '#374151';
+                ctx.textAlign = 'center';
+                // 0 (vermelho - inaceitável)
+                ctx.fillText('0', centerX - radius + 15, centerY + 10);
+                // 50 (amarelo - marginal)
+                ctx.fillText('50', centerX, centerY - radius + 30);
+                // 100 (verde - forte)
+                ctx.fillText('100', centerX + radius - 15, centerY + 10);
+            }
+        }
+        // VELOCÍMETRO GRANDE
+        drawSpeedometer('speedometerCanvas', scoreVulnerabilidade, true);
+        document.getElementById('scoreDisplay').textContent = scoreVulnerabilidade;
+        let scoreLabel = 'INACEITÁVEL';
+        let scoreColor = '#DC2626';
+        if (scoreVulnerabilidade >= 86) { scoreLabel = 'FORTE'; scoreColor = '#10B981'; }
+        else if (scoreVulnerabilidade >= 70) { scoreLabel = 'EFETIVO'; scoreColor = '#3B82F6'; }
+        else if (scoreVulnerabilidade >= 60) { scoreLabel = 'MARGINAL'; scoreColor = '#FBBF24'; }
+        else if (scoreVulnerabilidade >= 45) { scoreLabel = 'INAPROPRIADO'; scoreColor = '#F59E0B'; }
+        document.getElementById('scoreLabel').textContent = scoreLabel;
+        document.getElementById('scoreLabel').style.color = scoreColor;
+        document.getElementById('scoreDisplay').style.color = scoreColor;
+        // GAUGE DE RISCO OPERACIONAL (na aba relatórios detalhados)
+        setTimeout(() => {
+            const canvas = document.getElementById('gaugeRiscoOperacional');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                const centerX = 100;
+                const centerY = 110;
+                const radius = 90;
+                const value = 0.8; // Taxa de fraude 0.8%
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Segmentos coloridos INVERTIDOS (baixo = vermelho, alto = verde)
+                const segments = [
+                    { start: 0, end: 0.3, color: '#10B981', label: 'BAIXO' },    // Verde (0-1.5%)
+                    { start: 0.3, end: 0.6, color: '#FBBF24', label: 'MÉDIO' },  // Amarelo (1.5-3%)
+                    { start: 0.6, end: 1.0, color: '#DC2626', label: 'ALTO' }    // Vermelho (3-5%)
+                ];
+                segments.forEach(seg => {
+                    const segStartAngle = Math.PI + seg.start * Math.PI;
+                    const segEndAngle = Math.PI + seg.end * Math.PI;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, segStartAngle, segEndAngle);
+                    ctx.lineWidth = 25;
+                    ctx.strokeStyle = seg.color;
+                    ctx.lineCap = 'butt';
+                    ctx.stroke();
+                });
+                // Marcadores
+                for (let i = 0; i <= 6; i++) {
+                    const angle = Math.PI + (i / 6) * Math.PI;
+                    const innerR = radius - 15;
+                    const outerR = radius - 8;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + innerR * Math.cos(angle), centerY + innerR * Math.sin(angle));
+                    ctx.lineTo(centerX + outerR * Math.cos(angle), centerY + outerR * Math.sin(angle));
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.stroke();
+                }
+                // Ponteiro estilizado (0.8% no escala de 0-5%)
+                const normalizedValue = Math.min(value / 5, 1);
+                const angle = Math.PI + normalizedValue * Math.PI;
+                const pointerLength = radius - 15;
+                const tipX = centerX + pointerLength * Math.cos(angle);
+                const tipY = centerY + pointerLength * Math.sin(angle);
+                const baseWidth = 8;
+                const perpAngle = angle + Math.PI / 2;
+                const baseLeft = {
+                    x: centerX + baseWidth * Math.cos(perpAngle),
+                    y: centerY + baseWidth * Math.sin(perpAngle)
+                };
+                const baseRight = {
+                    x: centerX - baseWidth * Math.cos(perpAngle),
+                    y: centerY - baseWidth * Math.sin(perpAngle)
+                };
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                ctx.beginPath();
+                ctx.moveTo(tipX, tipY);
+                ctx.lineTo(baseLeft.x, baseLeft.y);
+                ctx.lineTo(baseRight.x, baseRight.y);
+                ctx.closePath();
+                const pointerGradient = ctx.createLinearGradient(centerX, centerY - baseWidth, centerX, centerY + baseWidth);
+                pointerGradient.addColorStop(0, '#4B5563');
+                pointerGradient.addColorStop(0.5, '#1F2937');
+                pointerGradient.addColorStop(1, '#111827');
+                ctx.fillStyle = pointerGradient;
+                ctx.fill();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                // Base do ponteiro
+                ctx.beginPath();
+                ctx.arc(centerX + 1, centerY + 1, 11, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 10, 0, 2 * Math.PI);
+                const circleGradient = ctx.createRadialGradient(centerX - 2, centerY - 2, 0, centerX, centerY, 10);
+                circleGradient.addColorStop(0, '#4B5563');
+                circleGradient.addColorStop(1, '#1F2937');
+                ctx.fillStyle = circleGradient;
+                ctx.fill();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(centerX - 2, centerY - 2, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+                // Labels
+                ctx.font = 'bold 11px Arial';
+                ctx.fillStyle = '#374151';
+                ctx.textAlign = 'center';
+                ctx.fillText('0%', centerX - radius + 10, centerY + 5);
+                ctx.fillText('2.5%', centerX, centerY - radius + 25);
+                ctx.fillText('5%', centerX + radius - 10, centerY + 5);
+            }
+        }, 200);
+        // MINI VELOCÍMETROS COM CORES
+        const miniGaugesData = [
+            { value: 95, label: 'Strong', range: '86-100%', color: '#10B981' },
+            { value: 77, label: 'Effective', range: '70-85%', color: '#3B82F6' },
+            { value: 64, label: 'Marginal', range: '60-69%', color: '#FBBF24' },
+            { value: 52, label: 'Inappropriate', range: '45-59%', color: '#F59E0B' },
+            { value: 26, label: 'Unacceptable', range: '0-44%', color: '#DC2626' }
+        ];
+        const miniGaugesContainer = document.getElementById('miniGaugesContainer');
+        miniGaugesData.forEach((gauge, idx) => {
+            const div = document.createElement('div');
+            div.className = 'mini-gauge';
+            const canvas = document.createElement('canvas');
+            canvas.id = `miniGauge${idx}`;
+            canvas.width = 120;
+            canvas.height = 80;
+            div.appendChild(canvas);
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'mini-gauge-value';
+            valueDiv.textContent = gauge.value + '%';
+            valueDiv.style.color = gauge.color;
+            div.appendChild(valueDiv);
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'mini-gauge-label';
+            labelDiv.textContent = gauge.label;
+            div.appendChild(labelDiv);
+            const rangeDiv = document.createElement('div');
+            rangeDiv.className = 'mini-gauge-range';
+            rangeDiv.textContent = gauge.range;
+            div.appendChild(rangeDiv);
+            miniGaugesContainer.appendChild(div);
+            setTimeout(() => {
+                const ctx = canvas.getContext('2d');
+                const centerX = 60;
+                const centerY = 70;
+                const radius = 50;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Segmentos coloridos INVERTIDOS (valor baixo = vermelho, alto = verde)
+                const segments = [
+                    { start: 0, end: 0.33, color: '#DC2626' },   // Vermelho
+                    { start: 0.33, end: 0.66, color: '#FBBF24' }, // Amarelo
+                    { start: 0.66, end: 1.0, color: '#10B981' }   // Verde
+                ];
+                segments.forEach(seg => {
+                    const segStartAngle = Math.PI + seg.start * Math.PI;
+                    const segEndAngle = Math.PI + seg.end * Math.PI;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, segStartAngle, segEndAngle);
+                    ctx.lineWidth = 15;
+                    ctx.strokeStyle = seg.color;
+                    ctx.lineCap = 'butt';
+                    ctx.stroke();
+                });
+                // Marcadores
+                for (let i = 0; i <= 4; i++) {
+                    const angle = Math.PI + (i / 4) * Math.PI;
+                    const innerR = radius - 10;
+                    const outerR = radius - 5;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + innerR * Math.cos(angle), centerY + innerR * Math.sin(angle));
+                    ctx.lineTo(centerX + outerR * Math.cos(angle), centerY + outerR * Math.sin(angle));
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.stroke();
+                }
+                // Ponteiro estilizado (gordinho na base, fino na ponta)
+                const angle = Math.PI + (gauge.value / 100) * Math.PI;
+                const pointerLength = radius - 10;
+                const tipX = centerX + pointerLength * Math.cos(angle);
+                const tipY = centerY + pointerLength * Math.sin(angle);
+                const baseWidth = 5;
+                const perpAngle = angle + Math.PI / 2;
+                const baseLeft = {
+                    x: centerX + baseWidth * Math.cos(perpAngle),
+                    y: centerY + baseWidth * Math.sin(perpAngle)
+                };
+                const baseRight = {
+                    x: centerX - baseWidth * Math.cos(perpAngle),
+                    y: centerY - baseWidth * Math.sin(perpAngle)
+                };
+                // Sombra
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 3;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 1;
+                // Desenhar triângulo
+                ctx.beginPath();
+                ctx.moveTo(tipX, tipY);
+                ctx.lineTo(baseLeft.x, baseLeft.y);
+                ctx.lineTo(baseRight.x, baseRight.y);
+                ctx.closePath();
+                const pointerGradient = ctx.createLinearGradient(centerX, centerY - baseWidth, centerX, centerY + baseWidth);
+                pointerGradient.addColorStop(0, '#4B5563');
+                pointerGradient.addColorStop(0.5, '#1F2937');
+                pointerGradient.addColorStop(1, '#111827');
+                ctx.fillStyle = pointerGradient;
+                ctx.fill();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+                ctx.shadowColor = 'transparent';
+                // Base do ponteiro
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+                ctx.fillStyle = '#1F2937';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(centerX - 1, centerY - 1, 2, 0, 2 * Math.PI);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+            }, 100);
+        });
+        // FUNÇÃO PARA CRIAR MATRIZ DE RISCO (SEM ESTRELA)
+        function createRiskMatrix(containerId, probIndex, impIndex, isSmall = false) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const matrizCores = [
+                ['#FB923C', '#FB923C', '#EF4444', '#EF4444', '#DC2626'],
+                ['#FBBF24', '#FB923C', '#FB923C', '#EF4444', '#EF4444'],
+                ['#84CC16', '#FBBF24', '#FB923C', '#EF4444', '#EF4444'],
+                ['#10B981', '#84CC16', '#FBBF24', '#FB923C', '#EF4444'],
+                ['#10B981', '#84CC16', '#FBBF24', '#FB923C', '#FB923C']
+            ];
+            const probLabels = ['QUASE CERTO', 'ALTA', 'MÉDIA', 'BAIXA', 'RARO'];
+            const impLabels = ['MÍNIMO', 'LEVE', 'MODERADO', 'GRAVE', 'CATASTRÓFICO'];
+            let html = '';
+            if (!isSmall) {
+                html += '<div class="matrix-row">';
+                html += '<div class="matrix-cell matrix-label">PROB ↓</div>';
+                impLabels.forEach(label => {
+                    html += `<div class="matrix-cell matrix-label">${label}</div>`;
+                });
+                html += '</div>';
+            }
+            matrizCores.forEach((row, i) => {
+                html += '<div class="matrix-row">';
+                if (!isSmall) {
+                    html += `<div class="matrix-cell matrix-label">${probLabels[i]}</div>`;
+                }
+                row.forEach((cor, j) => {
+                    const isMarked = (i === probIndex && j === impIndex);
+                    const cellClass = isSmall ? 'matrix-cell' : 'matrix-cell';
+                    const cellStyle = isSmall ? 'width: 50px; height: 42px; font-size: 20px;' : '';
+                    html += `<div class="${cellClass} ${isMarked ? 'marked' : ''}" style="background: ${cor}; ${cellStyle}">${isMarked ? 'X' : ''}</div>`;
+                });
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }
+        // CRIAR MATRIZES
+        createRiskMatrix('riskMatrixOverview', 2, 3, false);
+        createRiskMatrix('riskMatrixDetail', 2, 3, false);
+        createRiskMatrix('matrizHoje', 2, 3, true);
+        createRiskMatrix('matriz7dias', 1, 3, true);
+        createRiskMatrix('matriz30dias', 0, 4, true);
+        // EFEITO CASCATA
+        const cascadeData = [
+            { nivel: 'PRIMÁRIO', desc: 'Veículos Indevidos', valor: 114, cor: '#DC2626' },
+            { nivel: 'SECUNDÁRIO', desc: 'Motoristas Reincidentes', valor: 746, cor: '#F59E0B' },
+            { nivel: 'TERCIÁRIO', desc: 'Placas VIA Indevidas', valor: 671, cor: '#FBBF24' },
+            { nivel: 'TERCIÁRIO', desc: 'Motoristas Bloqueados', valor: 13, cor: '#10B981' }
+        ];
+        const cascadeContainer = document.getElementById('cascadeOverview');
+        const maxValue = Math.max(...cascadeData.map(d => d.valor));
+        cascadeData.forEach((item) => {
+            const width = (item.valor / maxValue) * 100;
+            const div = document.createElement('div');
+            div.className = 'cascade-item';
+            div.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 8px;">
+                    <span style="width: 120px; text-align: right; font-size: 11px; font-weight: 700; color: #6B7280;">${item.nivel}</span>
+                    <div style="flex: 1;">
+                        <div class="cascade-bar">
+                            <div class="cascade-bar-fill" style="width: ${width}%; background: ${item.cor};">
+                                <span style="font-size: 14px;">${item.desc}</span>
+                                <span style="font-size: 22px;">${item.valor}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            cascadeContainer.appendChild(div);
+        });
+        // TABELA DE ÁREAS (mantida para cálculos internos, mas não exibida)
+        // const tbody = document.getElementById('areasTableBody');
+        // dados.areas.forEach((area, idx) => {
+        //     let cor, badge;
+        //     if (area.percent === 0) { cor = '#DC2626'; badge = 'Inaceitável'; }
+        //     else if (area.percent < 30) { cor = '#F59E0B'; badge = 'Crítico'; }
+        //     else if (area.percent < 60) { cor = '#FBBF24'; badge = 'Marginal'; }
+        //     else { cor = '#10B981'; badge = 'Forte'; }
+        //     tbody.innerHTML += `
+        //         <tr>
+        //             <td style="font-weight: 700; text-align: center;">${idx + 1}</td>
+        //             <td style="font-weight: 600;">${area.nome}</td>
+        //             <td style="text-align: center; font-size: 20px; font-weight: 900; color: ${cor};">${area.percent}%</td>
+        //             <td style="text-align: center;">
+        //                 <span style="background: ${cor}; color: white; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 11px;">
+        //                     ${badge}
+        //                 </span>
+        //             </td>
+        //             <td>
+        //                 <div style="width: 100%; height: 24px; background: #E5E7EB; border-radius: 4px; overflow: hidden;">
+        //                     <div style="width: ${area.percent}%; height: 100%; background: ${cor}; transition: width 0.5s;"></div>
+        //                 </div>
+        //             </td>
+        //         </tr>
+        //     `;
+        // });
+        // TOP REINCIDENTES - ATUALIZADO COM VALORES SPX/LPR
+        const topReincidentes = [
+            { nome: 'CRISTINA MONTEIRO DOS', ocorrencias: 13, spxCat: 'VAN', lprCat: 'Passeio', valorSPX: 6350, valorLPR: 8825, prejuizo: 13043 },
+            { nome: 'Fabio Rodrigues Cost', ocorrencias: 12, spxCat: 'VAN', lprCat: 'Passeio', valorSPX: 6200, valorLPR: 8600, prejuizo: 11314 },
+            { nome: 'Luca Barbosa Lee', ocorrencias: 10, spxCat: 'Utilitário', lprCat: 'Passeio', valorSPX: 5800, valorLPR: 8200, prejuizo: 10156 },
+            { nome: 'Luca Delatorre Agulha', ocorrencias: 9, spxCat: 'VAN', lprCat: 'Passeio', valorSPX: 5600, valorLPR: 7800, prejuizo: 9021 },
+            { nome: 'Luciano Goncalves dol', ocorrencias: 8, spxCat: 'Fiorino', lprCat: 'Passeio', valorSPX: 5200, valorLPR: 7400, prejuizo: 8548 },
+            { nome: 'Hemilia Maia Deluchi', ocorrencias: 7, spxCat: 'VAN', lprCat: 'Passeio', valorSPX: 4900, valorLPR: 6900, prejuizo: 7247 },
+            { nome: 'Benedito de Rodrigues', ocorrencias: 7, spxCat: 'Utilitário', lprCat: 'Passeio', valorSPX: 4850, valorLPR: 6850, prejuizo: 7247 },
+            { nome: 'MAURICIO MARCONDA', ocorrencias: 7, spxCat: 'VAN', lprCat: 'Passeio', valorSPX: 4800, valorLPR: 6800, prejuizo: 6973 },
+            { nome: 'LUCIANO JOAQUIM DELA', ocorrencias: 7, spxCat: 'Fiorino', lprCat: 'Passeio', valorSPX: 4750, valorLPR: 6750, prejuizo: 6973 },
+            { nome: 'SAMALEY MAURILIO DOS', ocorrencias: 6, spxCat: 'VAN', lprCat: 'Passeio', valorSPX: 4500, valorLPR: 6500, prejuizo: 6204 }
+        ];
+        const topTable = document.getElementById('topReincidentesTable');
+        topReincidentes.forEach((item, idx) => {
+            topTable.innerHTML += `
+                <tr>
+                    <td style="font-weight: 700; text-align: center;">${idx + 1}</td>
+                    <td style="font-weight: 600;">${item.nome}</td>
+                    <td style="text-align: center; font-weight: 700; color: #DC2626;">${item.ocorrencias}</td>
+                    <td style="text-align: center; font-size: 11px;">${item.spxCat}</td>
+                    <td style="text-align: center; font-size: 11px; color: #10B981; font-weight: 600;">${item.lprCat}</td>
+                    <td style="text-align: center; font-weight: 600;">R$ ${item.valorSPX.toLocaleString('pt-BR')}</td>
+                    <td style="text-align: center; font-weight: 600; color: #10B981;">R$ ${item.valorLPR.toLocaleString('pt-BR')}</td>
+                    <td style="text-align: center; font-weight: 700; color: #DC2626;">R$ ${item.prejuizo.toLocaleString('pt-BR')}</td>
+                </tr>
+            `;
+        });
+        // ========================================
+        // DADOS E TABELA MÚLTIPLAS ATs
+        // ========================================
+        const motoristasMultiplasATs = [
+            { nome: 'João Silva - ID 1023', dias: 47, ats: 142, nivel: 'CRÍTICO' },
+            { nome: 'Maria Santos - ID 2048', dias: 35, ats: 98, nivel: 'CRÍTICO' },
+            { nome: 'Pedro Oliveira - ID 3012', dias: 32, ats: 89, nivel: 'CRÍTICO' },
+            { nome: 'Ana Costa - ID 1567', dias: 28, ats: 76, nivel: 'SISTEMÁTICO' },
+            { nome: 'Carlos Lima - ID 2891', dias: 26, ats: 71, nivel: 'SISTEMÁTICO' },
+            { nome: 'Fernanda Souza - ID 3456', dias: 24, ats: 68, nivel: 'SISTEMÁTICO' },
+            { nome: 'Ricardo Alves - ID 1789', dias: 22, ats: 62, nivel: 'SISTEMÁTICO' },
+            { nome: 'Juliana Rocha - ID 2345', dias: 19, ats: 54, nivel: 'SISTEMÁTICO' },
+            { nome: 'Marcos Ferreira - ID 3678', dias: 17, ats: 49, nivel: 'FREQUENTE' },
+            { nome: 'Patricia Dias - ID 1234', dias: 15, ats: 43, nivel: 'FREQUENTE' },
+            { nome: 'Roberto Santos - ID 2567', dias: 14, ats: 40, nivel: 'FREQUENTE' },
+            { nome: 'Amanda Silva - ID 3890', dias: 13, ats: 38, nivel: 'FREQUENTE' },
+            { nome: 'Bruno Costa - ID 1456', dias: 12, ats: 35, nivel: 'FREQUENTE' },
+            { nome: 'Carla Oliveira - ID 2789', dias: 11, ats: 32, nivel: 'FREQUENTE' },
+            { nome: 'Daniel Lima - ID 3123', dias: 10, ats: 29, nivel: 'FREQUENTE' },
+            { nome: 'Elaine Souza - ID 1678', dias: 9, ats: 27, nivel: 'FREQUENTE' },
+            { nome: 'Felipe Alves - ID 2901', dias: 8, ats: 24, nivel: 'OCASIONAL' },
+            { nome: 'Gabriela Rocha - ID 3234', dias: 7, ats: 21, nivel: 'OCASIONAL' },
+            { nome: 'Henrique Ferreira - ID 1890', dias: 6, ats: 18, nivel: 'OCASIONAL' },
+            { nome: 'Isabela Dias - ID 2456', dias: 5, ats: 15, nivel: 'OCASIONAL' }
+        ];
+        const rankingTable = document.getElementById('rankingMultiplasATs');
+        motoristasMultiplasATs.forEach((motorista, idx) => {
+            let corNivel, badgeNivel;
+            if (motorista.nivel === 'CRÍTICO') { corNivel = '#DC2626'; badgeNivel = 'CRÍTICO'; }
+            else if (motorista.nivel === 'SISTEMÁTICO') { corNivel = '#F59E0B'; badgeNivel = 'SISTEMÁTICO'; }
+            else if (motorista.nivel === 'FREQUENTE') { corNivel = '#FBBF24'; badgeNivel = 'FREQUENTE'; }
+            else { corNivel = '#10B981'; badgeNivel = 'OCASIONAL'; }
+            const mediaDia = (motorista.ats / motorista.dias).toFixed(1);
+            rankingTable.innerHTML += `
+                <tr>
+                    <td style="font-weight: 700; text-align: center;">${idx + 1}</td>
+                    <td style="font-weight: 600;">${motorista.nome}</td>
+                    <td style="text-align: center; font-weight: 700; color: ${corNivel};">${motorista.dias}</td>
+                    <td style="text-align: center; font-weight: 700; color: ${corNivel};">${motorista.ats}</td>
+                    <td style="text-align: center; font-weight: 700;">${mediaDia}</td>
+                    <td style="text-align: center;">
+                        <span style="background: ${corNivel}; color: white; padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 11px;">
+                            ${badgeNivel}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        });
+        // GRÁFICOS COM CHART.JS
+        // Gráfico Horário de Pico
+        new Chart(document.getElementById('chartHorario'), {
+            type: 'bar',
+            data: {
+                labels: ['6h', '7h', '8h', '9h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h'],
+                datasets: [{
+                    label: 'Ocorrências de Fraude',
+                    data: [2, 3, 5, 8, 6, 7, 9, 11, 8, 10, 12, 15, 18, 25, 20, 15, 8],
+                    backgroundColor: function(context) {
+                        const value = context.parsed.y;
+                        if (value >= 20) return '#DC2626';
+                        if (value >= 15) return '#F59E0B';
+                        if (value >= 10) return '#FBBF24';
+                        return '#3B82F6';
+                    },
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Fraudes: ' + context.parsed.y;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Número de Ocorrências', font: { weight: 'bold' } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Horário', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+        // Gráfico Categorias
+        new Chart(document.getElementById('chartCategorias'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Passeio', 'VAN', 'Utilitário', 'Fiorino', 'Outros'],
+                datasets: [{
+                    data: [51, 35, 18, 10, 0],
+                    backgroundColor: ['#DC2626', '#F59E0B', '#FBBF24', '#84CC16', '#10B981'],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'right',
+                        labels: {
+                            font: { size: 14, weight: 'bold' },
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        // Gráfico LPR Performance
+        new Chart(document.getElementById('chartLPR'), {
+            type: 'line',
+            data: {
+                labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+                datasets: [
+                    {
+                        label: 'Taxa de Sucesso LPR (%)',
+                        data: [82, 79, 76, 77.8],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#10B981'
+                    },
+                    {
+                        label: 'Meta 90%',
+                        data: [90, 90, 90, 90],
+                        borderColor: '#DC2626',
+                        borderDash: [10, 5],
+                        fill: false,
+                        borderWidth: 2,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        labels: { font: { size: 13, weight: 'bold' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: { display: true, text: 'Taxa de Sucesso (%)', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+        // Gráfico Falhas LPR
+        new Chart(document.getElementById('chartFalhas'), {
+            type: 'pie',
+            data: {
+                labels: ['Placas Incorretas', 'Não Reconhecidos', 'Reconhecidos'],
+                datasets: [{
+                    data: [111, 461, 11053],
+                    backgroundColor: ['#DC2626', '#F59E0B', '#10B981'],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: { font: { size: 13, weight: 'bold' }, padding: 15 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(2);
+                                return context.label + ': ' + context.parsed.toLocaleString() + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        // Gráfico Comparativo
+        new Chart(document.getElementById('chartComparativo'), {
+            type: 'bar',
+            data: {
+                labels: ['Passeio', 'VAN', 'Utilitário', 'Fiorino'],
+                datasets: [
+                    {
+                        label: 'Taxa de Fraude (%)',
+                        data: [0.74, 0.85, 0.83, 0.97],
+                        backgroundColor: '#DC2626',
+                        yAxisID: 'y',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Impacto Financeiro (R$ mil)',
+                        data: [71.043, 48.725, 25.056, 13.999],
+                        backgroundColor: '#F59E0B',
+                        yAxisID: 'y1',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        labels: { font: { size: 13, weight: 'bold' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Taxa de Fraude (%)', font: { weight: 'bold' } }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Impacto (R$ mil)', font: { weight: 'bold' } },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+        // Gráfico Temporal
+        new Chart(document.getElementById('chartTemporal'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [
+                    {
+                        label: 'Taxa de Fraude (%)',
+                        data: [0.52, 0.61, 0.73, 0.81, 0.89, 0.80],
+                        borderColor: '#DC2626',
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#DC2626'
+                    },
+                    {
+                        label: 'Ocorrências',
+                        data: [74, 87, 104, 115, 127, 114],
+                        borderColor: '#F59E0B',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#F59E0B',
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        labels: { font: { size: 13, weight: 'bold' } }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Taxa de Fraude (%)', font: { weight: 'bold' } },
+                        beginAtZero: true
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Ocorrências', font: { weight: 'bold' } },
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+        // Gráfico Impacto Financeiro por Motorista (principal)
+        new Chart(document.getElementById('chartImpactoFinanceiro'), {
+            type: 'bar',
+            data: {
+                labels: topReincidentes.map(m => m.nome.substring(0, 20)),
+                datasets: [{
+                    label: 'Prejuízo (R$)',
+                    data: topReincidentes.map(m => m.prejuizo),
+                    backgroundColor: '#FF6600',
+                    borderRadius: 6,
+                    borderWidth: 2,
+                    borderColor: '#E55A00'
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Prejuízo: R$ ' + context.parsed.x.toLocaleString('pt-BR');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Prejuízo (R$)', font: { weight: 'bold' } },
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + (value/1000).toFixed(0) + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        // Gráfico Padrões de Divergência SPX vs LPR
+        new Chart(document.getElementById('chartPadroesDivergencia'), {
+            type: 'bar',
+            data: {
+                labels: [
+                    'FURGÃO → VAN',
+                    'PASSEIO → VAN',
+                    'PASSEIO → UTILITÁRIO',
+                    'PASSEIO → CAMINHÃO',
+                    'PASSEIO → OUTROS',
+                    'PASSEIO → OPEL',
+                    'FURGÃO → CAMINHÃO',
+                    'PASSEIO → CITROËN',
+                    'PASSEIO → TOYOTA CROWN',
+                    'PASSEIO → WEIWANG'
+                ],
+                datasets: [{
+                    label: 'Ocorrências',
+                    data: [34, 25, 19, 19, 3, 2, 2, 2, 1, 1],
+                    backgroundColor: function(context) {
+                        const value = context.parsed.x;
+                        if (value >= 30) return '#DC2626';
+                        if (value >= 20) return '#F59E0B';
+                        if (value >= 10) return '#FBBF24';
+                        return '#93C5FD';
+                    },
+                    borderRadius: 6,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Ocorrências: ' + context.parsed.x;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Número de Ocorrências', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+        // Gráfico Heatmap (usando bar horizontal)
+        new Chart(document.getElementById('chartHeatmap'), {
+            type: 'bar',
+            data: {
+                labels: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'],
+                datasets: [
+                    {
+                        label: '6h-12h',
+                        data: [8, 9, 7, 10, 12, 5, 3],
+                        backgroundColor: '#84CC16'
+                    },
+                    {
+                        label: '12h-18h',
+                        data: [15, 18, 16, 20, 22, 8, 6],
+                        backgroundColor: '#FBBF24'
+                    },
+                    {
+                        label: '18h-22h',
+                        data: [25, 28, 30, 35, 40, 15, 10],
+                        backgroundColor: '#DC2626'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        labels: { font: { size: 13, weight: 'bold' } }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        title: { display: true, text: 'Número de Ocorrências', font: { weight: 'bold' } }
+                    },
+                    y: {
+                        stacked: true,
+                        title: { display: true, text: 'Dia da Semana', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+        // ========================================
+        // GRÁFICOS DO OVERVIEW EXECUTIVO
+        // ========================================
+        // Gráfico Top 5 Categorias Fraudadas (Overview)
+        new Chart(document.getElementById('chartCategoriasOverview'), {
+            type: 'bar',
+            data: {
+                labels: ['Passeio', 'VAN', 'Utilitário', 'Fiorino', 'Outros'],
+                datasets: [{
+                    label: 'Casos de Fraude',
+                    data: [51, 35, 18, 10, 0],
+                    backgroundColor: ['#DC2626', '#EF4444', '#F87171', '#FCA5A5', '#FEE2E2'],
+                    borderRadius: 8,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Fraudes: ' + context.parsed.y;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Número de Casos', font: { weight: 'bold', size: 11 } },
+                        ticks: { font: { size: 10 } }
+                    },
+                    x: {
+                        ticks: { font: { size: 10 } }
+                    }
+                }
+            }
+        });
+        // Gráfico Clusters Múltiplas ATs (Overview)
+        new Chart(document.getElementById('chartClustersOverview'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Ocasionais', 'Frequentes', 'Sistemáticos', 'Críticos'],
+                datasets: [{
+                    data: [312, 248, 134, 52],
+                    backgroundColor: ['#10B981', '#FBBF24', '#F59E0B', '#DC2626'],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: { 
+                            font: { size: 11, weight: 'bold' },
+                            padding: 10
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        // ========================================
+        // GRÁFICOS MÚLTIPLAS ATs
+        // ========================================
+        // Gráfico Horário Múltiplas ATs
+        new Chart(document.getElementById('chartHorarioMultiplas'), {
+            type: 'line',
+            data: {
+                labels: ['6h', '7h', '8h', '9h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h', '20h', '21h', '22h', '23h'],
+                datasets: [{
+                    label: 'Múltiplas ATs',
+                    data: [12, 15, 18, 24, 28, 32, 35, 38, 42, 48, 52, 58, 72, 95, 88, 76, 65, 45],
+                    borderColor: '#DC2626',
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#DC2626',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Múltiplas ATs: ' + context.parsed.y;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Número de Ocorrências', font: { weight: 'bold' } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Horário', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+        // Heatmap Múltiplas ATs
+        new Chart(document.getElementById('chartHeatmapMultiplas'), {
+            type: 'bar',
+            data: {
+                labels: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'],
+                datasets: [
+                    {
+                        label: '6h-12h',
+                        data: [18, 22, 19, 25, 28, 12, 8],
+                        backgroundColor: '#84CC16'
+                    },
+                    {
+                        label: '12h-18h',
+                        data: [32, 38, 35, 42, 45, 18, 14],
+                        backgroundColor: '#FBBF24'
+                    },
+                    {
+                        label: '18h-22h',
+                        data: [56, 62, 68, 75, 82, 35, 28],
+                        backgroundColor: '#DC2626'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        position: 'top',
+                        labels: { font: { size: 13, weight: 'bold' } }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        title: { display: true, text: 'Número de Múltiplas ATs', font: { weight: 'bold' } }
+                    },
+                    y: {
+                        stacked: true,
+                        title: { display: true, text: 'Dia da Semana', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+        // Box Plot (simulado com bar chart)
+        new Chart(document.getElementById('chartBoxPlotMultiplas'), {
+            type: 'bar',
+            data: {
+                labels: ['Ocasionais', 'Frequentes', 'Sistemáticos', 'Críticos'],
+                datasets: [{
+                    label: 'Média de ATs',
+                    data: [2.8, 5.4, 12.7, 28.3],
+                    backgroundColor: ['#10B981', '#FBBF24', '#F59E0B', '#DC2626'],
+                    borderRadius: 8,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Média: ' + context.parsed.y.toFixed(1) + ' ATs';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Média de ATs por Motorista', font: { weight: 'bold' } }
+                    },
+                    x: {
+                        title: { display: true, text: 'Nível de Risco', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+        // ✅ NOVO GRÁFICO: BARRAS EMPILHADAS HORIZONTAIS - Valor Pago (SPX) vs Valor Correto (LPR)
+new Chart(document.getElementById('chartImpactoA'), {
+    type: 'bar',
+    data: {
+        // Os nomes dos motoristas vão no eixo Y (rótulos verticais)
+        labels: topReincidentes.map(m => m.nome.substring(0, 18)),
+        datasets: [
+            {
+                label: 'Valor Pago (SPX)',
+                data: topReincidentes.map(m => m.valorSPX),
+                backgroundColor: '#F59E0B', // 🟡 Amarelo
+                stack: 'Stack 0'
+            },
+            {
+                label: 'Valor Correto (LPR)',
+                data: topReincidentes.map(m => m.valorLPR),
+                backgroundColor: '#10B981', // 🟢 Verde
+                stack: 'Stack 0'
+            },
+            {
+                label: 'Prejuízo (LPR - SPX)',
+                data: topReincidentes.map(m => m.valorLPR - m.valorSPX),
+                backgroundColor: '#DC2626', // 🔴 Vermelho
+                stack: 'Stack 0'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        indexAxis: 'y', // Isso faz com que as barras sejam horizontais
+        plugins: {
+            legend: { display: true },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const dataset = context.dataset;
+                        const value = context.parsed;
+                        if (dataset.label === 'Valor Pago (SPX)') {
+                            return `SPX Pago: R$ ${value.toLocaleString('pt-BR')}`;
+                        } else if (dataset.label === 'Valor Correto (LPR)') {
+                            return `LPR Total: R$ ${value.toLocaleString('pt-BR')}`;
+                        } else if (dataset.label === 'Prejuízo (LPR - SPX)') {
+                            return `Prejuízo: R$ ${value.toLocaleString('pt-BR')}`;
+                        }
+                        return `${dataset.label}: R$ ${value.toLocaleString('pt-BR')}`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                beginAtZero: true,
+                title: { display: true, text: 'Valor (R$)' },
+                ticks: {
+                    callback: function(value) {
+                        return 'R$ ' + (value/1000).toFixed(0) + 'K';
+                    }
+                }
+            },
+            y: {
+                title: { display: true, text: 'Motorista' }
+            }
+        }
+    }
+});
+    </script>
+    <script>
+        // Função para abrir a planilha do Google Sheets
+        function openGoogleSheet() {
+            const sheetId = document.getElementById('sheetIdInput').value.trim();
+            if (sheetId) {
+                const url = `https://docs.google.com/spreadsheets/d/${sheetId}/edit`;
+                window.open(url, '_blank');
+            } else {
+                alert('Por favor, insira o ID da planilha.');
+            }
+        }
+    </script>
+</body>
+</html>
